@@ -1,5 +1,5 @@
-# ToucanClientAS
-This is the toucan_client ported to Android Studio
+# Toucan Client
+A client library for Toucan, JavocSoft Push Notification service. This is the toucan_client library ported to Android Studio.
 
 ##Project Integration##
 
