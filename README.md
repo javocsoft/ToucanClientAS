@@ -10,9 +10,7 @@ You can also clone the project "ToucanClientAS" from GitHub (https://github.com/
 
 Also, you have to set this code in your AndroidManifest.xml to declare the service that will send any pending data:
 
-<pre>
-  <service android:name="es.javocsoft.android.lib.toucan.client.service.PendingOperationsDeliveryService" />
-</pre>
+    <service android:name="es.javocsoft.android.lib.toucan.client.service.PendingOperationsDeliveryService" />
 
 
 ##LICENSE##
