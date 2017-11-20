@@ -1,5 +1,6 @@
 # Toucan Client
-An Android Studio client library to connect, in conjuction with ToolBox library (https://github.com/javocsoft/JavocsoftToolboxAS), your application with Pushburst, JavocSoft Push Notification service at http://www.pushburst.com/.
+
+An Android Studio client library to connect, in conjuction with ToolBox library (https://github.com/javocsoft/JavocsoftToolboxAS), your application with <b>Pushburst</b>, JavocSoft Push Notification service at http://www.pushburst.com/.
 
 ##Project Integration##
 
