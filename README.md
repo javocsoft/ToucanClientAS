@@ -2,7 +2,7 @@
 
 An Android Studio client library to connect, in conjuction with ToolBox library (https://github.com/javocsoft/JavocsoftToolboxAS), your application with <b>Pushburst</b>, JavocSoft Push Notification service at http://www.pushburst.com/.
 
-##Project Integration##
+## Project Integration ##
 
 This is an Android Studio Library project. To integrate in your project, just put in your application build.gradle the following:
 
@@ -15,7 +15,7 @@ In addition to build.gradle, you have to declare a Toucan service in your Androi
     <service android:name="es.javocsoft.android.lib.toucan.client.service.PendingOperationsDeliveryService" />
 
 
-##LICENSE##
+## LICENSE ##
 
 Copyright 2010-2017 JavocSoft.
 
