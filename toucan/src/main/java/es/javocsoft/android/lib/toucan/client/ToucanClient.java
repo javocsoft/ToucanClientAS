@@ -56,8 +56,10 @@ public class ToucanClient {
 
 	/** The instance of the API client */
 	private static ToucanClient toucanClient;
+
+	private static final String JVC_API_ENDPOINT = "https://api.toucan.javocsoft.es";
 	
-	private static final String API_ENDPOINT_BASE = "https://api.toucan.javocsoft.es";
+	private static String API_ENDPOINT_BASE = JVC_API_ENDPOINT;
 	
 	private static final String OS_TAG = "Android";
 	public static final String LOG_TAG = "ToucanClient";
@@ -67,7 +69,7 @@ public class ToucanClient {
 	private String deviceUniqueId = null;
 	private String deviceNotificationToken = null;
 	private String apiToken = null;	
-	
+
 	private String OSInfo = null;
 	private String DEVInfo = null;
 	
@@ -120,11 +122,12 @@ public class ToucanClient {
 	/**
 	 * Gets the instance of the Toucan client.
 	 * 
-	 * @param context
-	 * @param apiToken
-	 * @param appPublicKey
+	 * @param context	The context where the library is initiallized.
+	 * @param apiToken	The notification server API TOKEN for communications.
+	 * @param appPublicKey	The application Public key.
 	 * @return
 	 */
+	@SuppressWarnings({"unused"})
 	public static ToucanClient getInstance(Context context, 
 			String apiToken, String appPublicKey) {
 		if(toucanClient==null) {
@@ -137,7 +140,34 @@ public class ToucanClient {
 		}		
 		return toucanClient;
 	}
-	
+
+	/**
+	 * Gets the instance of the Toucan client. When using this method, we set our custom notification
+	 * server.
+	 *
+	 * @param context	The context where the library is initiallized.
+	 * @param apiToken	The notification server API TOKEN for communications.
+	 * @param appPublicKey	The application Public key.
+	 * @param svcUrl Optional. If null, default value is set {@link ToucanClient#JVC_API_ENDPOINT}.
+	 * @return
+	 */
+	@SuppressWarnings({"unused"})
+	public static ToucanClient getInstance(Context context,
+										   String apiToken, String appPublicKey, String svcUrl) {
+		if(toucanClient==null) {
+			toucanClient = new ToucanClient();
+			toucanClient.context = context;
+			toucanClient.appPublicKey = appPublicKey;
+			toucanClient.apiToken = apiToken;
+
+			if(svcUrl!=null && svcUrl.length()>0)
+				toucanClient.API_ENDPOINT_BASE = svcUrl;
+
+			toucanClient.init();
+		}
+		return toucanClient;
+	}
+
 	private void init() {
 		OSInfo = OS_TAG + " " + ToolBox.device_getOSVersion() + " - " + "(API Level " + ToolBox.device_getAPILevel() + ")";
 		DEVInfo = ToolBox.device_getExtraInfo();
@@ -167,6 +197,7 @@ public class ToucanClient {
 	 * @param notificationToken	The GCM notification token.	
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void deviceRegistration(String notificationToken, ResponseCallback callback) {
 		//Save the device GCM notification token.
 		toucanClient.deviceNotificationToken = notificationToken;
@@ -188,6 +219,7 @@ public class ToucanClient {
 	 * @param externalId	An external id that links GCM with some kind of internal back-end.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void deviceRegistration(String notificationToken, int externalId, ResponseCallback callback) {
 		//Save the device GCM notification token.
 		toucanClient.deviceNotificationToken = notificationToken;
@@ -216,6 +248,7 @@ public class ToucanClient {
 	 * @param installReferral	The installation referral data.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void deviceRegistration(String notificationToken, String installReferral, ResponseCallback callback) {
 		//Save the device GCM notification token.
 		toucanClient.deviceNotificationToken = notificationToken;
@@ -246,6 +279,7 @@ public class ToucanClient {
 	 * @param installReferral	The installation referral data.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void deviceRegistration(String notificationToken, int externalId, String installReferral, ResponseCallback callback) {
 		//Save the device GCM notification token.
 		toucanClient.deviceNotificationToken = notificationToken;
@@ -274,6 +308,7 @@ public class ToucanClient {
 	 * @param installReferral	The installation referral data.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void informInstallReferral(String installReferral, ResponseCallback callback) {
 		
 		if(isNotificationTokenPresent()) {
@@ -302,6 +337,7 @@ public class ToucanClient {
 	 * @param externalId	The external id.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void informExternalId(int externalId, ResponseCallback callback) {
 		
 		if(isNotificationTokenPresent()) {
@@ -330,6 +366,7 @@ public class ToucanClient {
 	 * 								GCM registration token for the application.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doReceivedACK(Bundle notificationBundle, ResponseCallback callback) {
 		if(isNotificationTokenPresent()) {
 			ACKRequest ackRequest = generateACKnfo(notificationBundle);
@@ -354,6 +391,7 @@ public class ToucanClient {
 	 * 								GCM registration token for the application.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doReadACK(Bundle notificationBundle, ResponseCallback callback) {
 		if(isNotificationTokenPresent()) {
 			ACKRequest ackRequest = generateACKnfo(notificationBundle);
@@ -377,6 +415,7 @@ public class ToucanClient {
 	 * @param tags	A list of tags.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doAddTags(List<String> tags,ResponseCallback callback) {
 		//Prepare device registration request
 		AppDevTagsOperationRequest tagAddRequest = new AppDevTagsOperationRequest();
@@ -408,6 +447,7 @@ public class ToucanClient {
 	 * @param tags		tags to add.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doResetTags(List<String> tags,ResponseCallback callback) {
 		//Prepare device registration request
 		AppDevTagsOperationRequest tagAddRequest = new AppDevTagsOperationRequest();
@@ -438,6 +478,7 @@ public class ToucanClient {
 	 * @param tags		A list of tags to remove.
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doRemoveTags(List<String> tags, ResponseCallback callback) {
 		//Prepare device registration request
 		AppDevTagsOperationRequest tagAddRequest = new AppDevTagsOperationRequest();
@@ -467,6 +508,7 @@ public class ToucanClient {
 	 * 
 	 * @param callback A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doListTags(ResponseCallback callback) {
 		try{ 
 			String appHashSignature = generateSHA1(appPublicKey + apiToken);
@@ -497,6 +539,7 @@ public class ToucanClient {
 	 * 
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doDeviceUnregister(ResponseCallback callback) {
 		try{ 
 			String appHashSignature = generateSHA1(appPublicKey + apiToken);
@@ -523,6 +566,7 @@ public class ToucanClient {
 	 * 
 	 * @param callback	A callback to run when operation finishes.
 	 */
+	@SuppressWarnings({"unused"})
 	public void doEnableRegisteredDevice(ResponseCallback callback) {
 		
 		try{ 
