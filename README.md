@@ -1,14 +1,15 @@
 # Toucan Client
-A client library for Toucan, JavocSoft Push Notification service. This is the toucan_client library ported to Android Studio.
+An Android Studio client library to connect, in conjuction with ToolBox library (https://github.com/javocsoft/JavocsoftToolboxAS), your application with Pushburst, JavocSoft Push Notification service at http://www.pushburst.com/.
 
 ##Project Integration##
 
-This is an Android Studio Library project. To integrate in your project just put in your gradle build:
+This is an Android Studio Library project. To integrate in your project, just put in your application build.gradle the following:
 
 compile 'es.javocsoft:toucanclient:1.0.0'
+
 You can also clone the project "ToucanClientAS" from GitHub (https://github.com/javocsoft/ToucanClientAS.git).
 
-Also, you have to set this code in your AndroidManifest.xml to declare the service that will send any pending data:
+In addition to build.gradle, you have to declare a Toucan service in your AndroidManifest.xml, this service is responsible of sending any pending data to the notification service:
 
     <service android:name="es.javocsoft.android.lib.toucan.client.service.PendingOperationsDeliveryService" />
 
