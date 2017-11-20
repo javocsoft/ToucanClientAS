@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ToucanClient.iml" filepath="$PROJECT_DIR$/ToucanClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/toucan/toucan.iml" filepath="$PROJECT_DIR$/toucan/toucan.iml" />
+    </modules>
+  </component>
+</project>

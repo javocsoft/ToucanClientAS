@@ -1,0 +1,45 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        jcenter()
+        google()
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+    dependencies {
+        //classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
+
+        //To generate Maven stuff and upload to JCenter (JFrog) [Maven Repository]
+        // See:
+        //      https://gist.github.com/lopspower/6f62fe1492726d848d6d
+        //      https://github.com/dcendents/android-maven-gradle-plugin
+        //
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+        maven {
+            url "https://maven.google.com"
+        }
+        //JavocSoft libraries repository
+        maven {
+            url "https://dl.bintray.com/javocsoft/maven"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

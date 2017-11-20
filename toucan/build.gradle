@@ -1,0 +1,291 @@
+//https://developer.android.com/studio/projects/android-library.html
+apply plugin: 'com.android.library'
+
+//For upload to Maven repository using JFROG
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: "com.jfrog.bintray"
+// This is the library version used when deploying the artifact
+// (change to a new version every new library release)
+//
+// 1.- Change version to a new one.
+version = "1.0.2"
+// 1.- First, run "Gradle->build->assembleRelease"
+// 2.- Second run "Gradle->Other->Install" to generate Maven stuff.
+//     (it will run task javadocJar and sourcesJar leaving artifacts in $buildDir/libs)
+// 2.- Third, execute "Gradle->Publishing->bintrayUpload" to upload the library to JCenter
+// 3.- Check in https://bintray.com/javocsoft/maven/es.javocsoft%3Atoucanclient
+
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+
+        //https://developer.android.com/studio/publish/versioning.html
+        versionCode 3
+        versionName "1.0.2"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    //implementation 'com.android.support:appcompat-v7:26.1.0'
+    //testImplementation 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+    //androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    // Other external libraries required
+    compile 'com.google.code.gson:gson:2.8.1'
+
+    //Javocsoft library dependencies
+    compile 'es.javocsoft:toolbox:1.2.2'
+}
+
+
+// Configuration to be able to generate POM file and upload to JCenter
+def siteUrl = 'https://github.com/javocsoft/ToucanClientAS'      // Homepage URL of the library
+def gitUrl = 'https://github.com/javocsoft/ToucanClientAS.git'   // Git repository URL
+group = "es.javocsoft"                                           // Maven Group ID for the artifact
+
+// POM & Maven
+// Run "Gradle->Other->Install to execute this code."
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                artifactId 'toucan'
+
+                // Add your description here
+                name 'es.javocsoft:toucanclient'
+                description = 'Android library that communicates with JavocSoft Push Notification service.'
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name 'GNU General Public License v3.0'
+                        url 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'javocsoft'
+                        name 'Javier Gonzalez Serrano'
+                        email 'javocsoft@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+    //destinationDir = file("$buildDir")
+    //failOnError false
+}
+
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.io.FileOutputStream
+import java.util.zip.ZipFile
+
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    //classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
+    classpath += configurations.provided
+    //FIX To avoid issues getting R class.
+    classpath += files("build/generated/source/r/release")
+    classpath += files("build/generated/source/buildConfig/release")
+    //destinationDir = file("$buildDir/")
+
+    afterEvaluate {
+        // Wait after evaluation to add the android classpath
+        // to avoid "buildToolsVersion is not specified" error
+        classpath += files(android.getBootClasspath())
+
+        // Process AAR dependencies
+        def aarDependencies = classpath.filter { it.name.endsWith('.aar') }
+        classpath -= aarDependencies
+        aarDependencies.each { aar ->
+            // Extract classes.jar from the AAR dependency, and add it to the javadoc classpath
+            def outputPath = "$buildDir/tmp/aarJar/${aar.name.replace('.aar', '.jar')}"
+            classpath += files(outputPath)
+
+            // Use a task so the actual extraction only happens before the javadoc task is run
+            dependsOn task(name: "extract ${aar.name}").doLast {
+                extractEntry(aar, 'classes.jar', outputPath)
+            }
+        }
+    }
+}
+// Utility method to extract only one entry in a zip file
+private def extractEntry(archive, entryPath, outputPath) {
+    if (!archive.exists()) {
+        throw new GradleException("archive $archive not found")
+    }
+
+    def zip = new ZipFile(archive)
+    zip.entries().each {
+        if (it.name == entryPath) {
+            def path = Paths.get(outputPath)
+            if (!Files.exists(path)) {
+                Files.createDirectories(path.getParent())
+                Files.copy(zip.getInputStream(it), path)
+            }
+        }
+    }
+    zip.close()
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+/* Gradle task which finds source and javadoc by location/naming convention, and registers them
+   in the .idea files on sync. It belongs in the root gradle file's allProjects section. As-is,
+   it expects to find [projectname]/libs/lib.jar next to lib-sources.jar and/or lib-javadoc.jar.
+   Also, as noted in comments, if your javadocs not pathed at "/" inside the jar, you may need to
+   change the script to add "docs/html" (for example) at the end of "jar://$doc!/"
+ */
+task addJavaDoc {
+    afterEvaluate {
+        // Specify paths, this will be run per non-root project
+        def projectDir = project.getProjectDir().getCanonicalPath()
+        def rootDir = project.getRootDir().getCanonicalPath()
+        def lib = projectDir + '/libs'
+
+        // println lib // Uncomment this to troubleshoot
+        // Get any jar dependencies register in the lib folder
+        fileTree(include: ['*.jar'], exclude: ['*-source.jar', '*-javadoc.jar'], dir: lib ).each { File jar ->
+            def jarName = jar.getName()
+            def moduleName = jarName.substring(0, jarName.lastIndexOf("."))
+            // IntelliJ does this to file names when making the xml files
+            def escapedName = moduleName.replace("-", "_").replace(".", "_")
+            def xmlFile = "$rootDir/.idea/libraries/${escapedName}.xml"
+            // println xmlFile // Uncomment this to troubleshoot
+            if (new File(xmlFile).exists()) {
+                ['javadoc', 'sources'].each {String docType ->
+                    // Get sources or java doc by naming convention, (expects name-sources or name-javadoc
+                    def doc = "$lib/$moduleName-${docType}.jar"
+                    // println doc // Uncomment this to troubleshoot
+                    if(new File(doc).exists()) {
+                        def xml = new XmlParser().parse(xmlFile);
+                        def xmlTag = docType.toUpperCase()
+                        // Perform xml replacement by convention
+                        xml.library[xmlTag].replaceNode {
+                            "$xmlTag" {
+                                root(url: "jar://$doc!/")
+                            }
+                        }
+                        // Write out changes
+                        new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile))).print(xml)
+                        // Notify that changes worked
+                        println "Fixed up reference to $doc"
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Load properties of the project
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+// Configuration to upload to JCenter
+// https://github.com/bintray/gradle-bintray-plugin
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        // it is the name that appears in bintray when logged
+        name = "es.javocsoft:toucanclient"
+        desc = "It is an Android utility library to communicate with JavocSoft Push Notification service. For HowTo and usage see the WiKi https://github.com/javocsoft/toucanclient/wiki. This project is a library for Android. This library depends of another library called \"ToolBox\"."
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        //userOrg = "JavocSoft"
+        issueTrackerUrl = 'https://github.com/javocsoft/ToucanClientAS/issues'
+        labels = ["Android", "ToucanClient"]
+        //released  = new Date()
+        //vcsTag = "1.0.0"
+        licenses = ["gpl-3.0"]
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            //name = '1.0.0-Final' //Bintray logical version name
+            //desc = //Optional - Version-specific description'
+            //released  = //Optional - Date of the version release. 2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
+            //vcsTag = '1.0.0'
+            //attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
+
+            //Optional configuration for Maven Central sync of the version
+            mavenCentralSync {
+                sync = false //[Default: true] Determines whether to sync the version to Maven Central.
+                user = properties.getProperty("sonatypeOSS.username") //OSS user token: mandatory
+                password = properties.getProperty("sonatypeOSS.password") //OSS user password: mandatory
+                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
+
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
+            }
+        }
+    }
+}
+
+
+
+
+
+// This plugin and task downloads javadocs and sources when using libraries.
+apply plugin: 'idea'
+idea{
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
