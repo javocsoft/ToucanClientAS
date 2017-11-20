@@ -8,6 +8,13 @@ This is an Android Studio Library project. To integrate in your project just put
 compile 'es.javocsoft:toucanclient:1.0.0'
 You can also clone the project "ToucanClientAS" from GitHub (https://github.com/javocsoft/ToucanClientAS.git).
 
+Also, you have to set this code in your AndroidManifest.xml to declare the service that will send any pending data:
+
+<pre>
+  <service android:name="es.javocsoft.android.lib.toucan.client.service.PendingOperationsDeliveryService" />
+</pre>
+
+
 ##LICENSE##
 
 Copyright 2010-2017 JavocSoft.
