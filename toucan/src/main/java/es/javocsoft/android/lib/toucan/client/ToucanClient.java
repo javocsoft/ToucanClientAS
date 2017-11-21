@@ -68,7 +68,8 @@ public class ToucanClient {
 	private String appPublicKey = null;
 	private String deviceUniqueId = null;
 	private String deviceNotificationToken = null;
-	private String apiToken = null;	
+	private String apiToken = null;
+	private boolean ignoreSSLErrors = false;
 
 	private String OSInfo = null;
 	private String DEVInfo = null;
@@ -120,7 +121,7 @@ public class ToucanClient {
 	
 	
 	/**
-	 * Gets the instance of the Toucan client.
+	 * Gets the instance of the Toucan client. In this case, SSL errors are not ignored.
 	 * 
 	 * @param context	The context where the library is initiallized.
 	 * @param apiToken	The notification server API TOKEN for communications.
@@ -130,15 +131,23 @@ public class ToucanClient {
 	@SuppressWarnings({"unused"})
 	public static ToucanClient getInstance(Context context, 
 			String apiToken, String appPublicKey) {
-		if(toucanClient==null) {
-			toucanClient = new ToucanClient();			
-			toucanClient.context = context;
-			toucanClient.appPublicKey = appPublicKey;			
-			toucanClient.apiToken = apiToken;			
-			
-			toucanClient.init();
-		}		
-		return toucanClient;
+
+		return getInstance(context, apiToken, appPublicKey, null, false);
+	}
+
+	/**
+	 * Gets the instance of the Toucan client. When using this method, we set our custom notification
+	 * server. In this case, SSL errors are not ignored.
+	 *
+	 * @param context	The context where the library is initiallized.
+	 * @param apiToken	The notification server API TOKEN for communications.
+	 * @param appPublicKey	The application Public key.
+	 * @param svcUrl Optional. If null, default value is set {@link ToucanClient#JVC_API_ENDPOINT}.
+	 * @return
+	 */
+	public static ToucanClient getInstance(Context context,
+										   String apiToken, String appPublicKey, String svcUrl) {
+		return getInstance(context, apiToken, appPublicKey, svcUrl, false);
 	}
 
 	/**
@@ -149,16 +158,20 @@ public class ToucanClient {
 	 * @param apiToken	The notification server API TOKEN for communications.
 	 * @param appPublicKey	The application Public key.
 	 * @param svcUrl Optional. If null, default value is set {@link ToucanClient#JVC_API_ENDPOINT}.
+	 * @param ignoreSSLErrors	Set to TRUE to make Toucan ignore any SSL error when contacting with
+	 *                          the notification server.
 	 * @return
 	 */
 	@SuppressWarnings({"unused"})
 	public static ToucanClient getInstance(Context context,
-										   String apiToken, String appPublicKey, String svcUrl) {
+										   String apiToken, String appPublicKey, String svcUrl,
+										   boolean ignoreSSLErrors) {
 		if(toucanClient==null) {
 			toucanClient = new ToucanClient();
 			toucanClient.context = context;
 			toucanClient.appPublicKey = appPublicKey;
 			toucanClient.apiToken = apiToken;
+			toucanClient.ignoreSSLErrors = ignoreSSLErrors;
 
 			if(svcUrl!=null && svcUrl.length()>0)
 				toucanClient.API_ENDPOINT_BASE = svcUrl;
@@ -374,9 +387,9 @@ public class ToucanClient {
 				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_ACK_RECEIVED);
 			
 			if(ToolBox.net_isNetworkAvailable(context)){
-				new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_RECEIVED, API_OPERATION_ACK_RECEIVED, callback).start();				
+				new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_RECEIVED, API_OPERATION_ACK_RECEIVED, ignoreSSLErrors, callback).start();
 			}else{
-				cacheOperationRequest(new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_RECEIVED, API_OPERATION_ACK_RECEIVED, callback), true);
+				cacheOperationRequest(new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_RECEIVED, API_OPERATION_ACK_RECEIVED, ignoreSSLErrors, callback), true);
 			}
 						
 		}else{
@@ -399,9 +412,9 @@ public class ToucanClient {
 				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_ACK_READ);
 			
 			if(ToolBox.net_isNetworkAvailable(context)){
-				new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_READ, API_OPERATION_ACK_READ, callback).start();				
+				new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_READ, API_OPERATION_ACK_READ, ignoreSSLErrors, callback).start();
 			}else{
-				cacheOperationRequest(new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_READ, API_OPERATION_ACK_READ, callback), true);
+				cacheOperationRequest(new ToucanPostWorker(context, apiToken, ackRequest, TOUCAN_WORKER_POST_DATA_TYPE.ACK, API_ENDPOINT_ACK_READ, API_OPERATION_ACK_READ, ignoreSSLErrors, callback), true);
 			}
 			
 		}else{
@@ -433,9 +446,9 @@ public class ToucanClient {
 			callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_ADD_TAGS);
 				
 		if(ToolBox.net_isNetworkAvailable(context)){
-			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_ADD_TAGS, API_OPERATION_ADD_TAGS, callback).start();
+			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_ADD_TAGS, API_OPERATION_ADD_TAGS, ignoreSSLErrors, callback).start();
 		}else{
-			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_ADD_TAGS, API_OPERATION_ADD_TAGS, callback), true);
+			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_ADD_TAGS, API_OPERATION_ADD_TAGS, ignoreSSLErrors, callback), true);
 		}
 				
 	}
@@ -465,9 +478,9 @@ public class ToucanClient {
 			callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_RESET_TAGS);
 				
 		if(ToolBox.net_isNetworkAvailable(context)){
-			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_RESET_TAGS, API_OPERATION_RESET_TAGS, callback).start();
+			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_RESET_TAGS, API_OPERATION_RESET_TAGS, ignoreSSLErrors, callback).start();
 		}else{
-			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_RESET_TAGS, API_OPERATION_RESET_TAGS, callback), true);
+			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_RESET_TAGS, API_OPERATION_RESET_TAGS, ignoreSSLErrors, callback), true);
 		}
 				
 	}
@@ -496,9 +509,9 @@ public class ToucanClient {
 			callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_LIST_TAGS);
 		
 		if(ToolBox.net_isNetworkAvailable(context)){
-			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_REMOVE_TAGS, API_OPERATION_REMOVE_TAGS, callback).start();
+			new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_REMOVE_TAGS, API_OPERATION_REMOVE_TAGS, ignoreSSLErrors, callback).start();
 		}else{
-			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_REMOVE_TAGS, API_OPERATION_REMOVE_TAGS, callback), true);
+			cacheOperationRequest(new ToucanPostWorker(context, apiToken, tagAddRequest, TOUCAN_WORKER_POST_DATA_TYPE.TAGS, API_ENDPOINT_REMOVE_TAGS, API_OPERATION_REMOVE_TAGS, ignoreSSLErrors, callback), true);
 		}
 		
 	}
@@ -523,9 +536,9 @@ public class ToucanClient {
 				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_LIST_TAGS);
 			
 			if(ToolBox.net_isNetworkAvailable(context)){
-				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_LIST_TAGS, callback).start();
+				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_LIST_TAGS, ignoreSSLErrors, callback).start();
 			}else{
-				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_LIST_TAGS, callback), true);
+				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_LIST_TAGS, ignoreSSLErrors, callback), true);
 			}
 			
 		}catch(Exception e){
@@ -551,9 +564,9 @@ public class ToucanClient {
 			String finalUrl = API_ENDPOINT_UNREGISTRATION + "=" + urlEncodedUrlParams;
 			
 			if(ToolBox.net_isNetworkAvailable(context)){
-				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_UNREGISTRATION, callback).start();
+				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_UNREGISTRATION, ignoreSSLErrors, callback).start();
 			}else{
-				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_UNREGISTRATION, callback), true);
+				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_UNREGISTRATION, ignoreSSLErrors, callback), true);
 			}
 			
 		}catch(Exception e){
@@ -579,9 +592,9 @@ public class ToucanClient {
 			String finalUrl = API_ENDPOINT_ENABLE_REGISTERED_DEVICE + "=" + urlEncodedUrlParams;
 			 
 			if(ToolBox.net_isNetworkAvailable(context)){
-				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_ENABLE, callback).start();
+				new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_ENABLE, ignoreSSLErrors, callback).start();
 			}else{
-				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_ENABLE, callback), true);
+				cacheOperationRequest(new ToucanGetWorker(context, apiToken, finalUrl, API_OPERATION_DEVICE_ENABLE, ignoreSSLErrors, callback), true);
 			}
 			
 		}catch(Exception e){
@@ -649,17 +662,17 @@ public class ToucanClient {
 	
 	private void launchDeviceRegistrationRequest(DeviceRegistrationRequest devRegRequest, ResponseCallback callback) {
 		if(ToolBox.net_isNetworkAvailable(context)){
-			new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_DEVICE_REGISTRATION, callback).start();			
+			new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_DEVICE_REGISTRATION, ignoreSSLErrors, callback).start();
 		}else{
-			cacheOperationRequest(new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_DEVICE_REGISTRATION, callback), true);
+			cacheOperationRequest(new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_DEVICE_REGISTRATION, ignoreSSLErrors, callback), true);
 		}
 	}
 	
 	private void launchInformReferralRequest(DeviceRegistrationRequest devRegRequest, ResponseCallback callback) {
 		if(ToolBox.net_isNetworkAvailable(context)){
-			new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_INFORM_REFERRAL, callback).start();
+			new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_INFORM_REFERRAL, ignoreSSLErrors, callback).start();
 		}else{
-			cacheOperationRequest(new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_INFORM_REFERRAL, callback), true);
+			cacheOperationRequest(new ToucanPostWorker(context, apiToken, devRegRequest, TOUCAN_WORKER_POST_DATA_TYPE.REGISTRATION, API_ENDPOINT_REGISTRATION, API_OPERATION_INFORM_REFERRAL, ignoreSSLErrors, callback), true);
 		}		
 	}
 		

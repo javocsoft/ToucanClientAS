@@ -43,12 +43,12 @@ import es.javocsoft.android.lib.toucan.client.thread.callback.ResponseCallback;
 public class ToucanGetWorker extends ToucanWorker {
 
 	
-	public ToucanGetWorker(Context context, String apiToken, String endpoint, String opName, ResponseCallback callback) {
-		super(TOUCAN_WORKER_TYPE.GET, context, apiToken, endpoint, opName, callback);
+	public ToucanGetWorker(Context context, String apiToken, String endpoint, String opName, boolean ignoreSSLErrors, ResponseCallback callback) {
+		super(TOUCAN_WORKER_TYPE.GET, context, apiToken, endpoint, opName, ignoreSSLErrors, callback);
 	}
 	
 	public ToucanGetWorker(ToucanWorker tWorker) {
-		super(TOUCAN_WORKER_TYPE.GET, tWorker.context, tWorker.apiToken, tWorker.data, tWorker.dataType, tWorker.endpoint, tWorker.opname, tWorker.callback);
+		super(TOUCAN_WORKER_TYPE.GET, tWorker.context, tWorker.apiToken, tWorker.data, tWorker.dataType, tWorker.endpoint, tWorker.opname, tWorker.isIgnoreSSLErrors(), tWorker.callback);
 	}
 	
 	
@@ -67,7 +67,7 @@ public class ToucanGetWorker extends ToucanWorker {
         	String response = ToolBox.net_httpclient_doAction(
         			HTTP_METHOD.GET, 
         			finalUrl, 
-        			jsonDataKey, jsonData, headersData);
+        			jsonDataKey, jsonData, headersData, ignoreSSLErrors);
         	
         	Log.i(ToucanClient.LOG_TAG, opname.toUpperCase() + 
         			". Sent to Toucan API. Call response '" + response + "'");                

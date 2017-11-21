@@ -71,7 +71,9 @@ public abstract class ToucanWorker extends Thread implements Runnable {
 	protected TOUCAN_WORKER_POST_DATA_TYPE dataType;
 	
 	private transient String jsonData;
-	
+
+	@Expose
+	protected boolean ignoreSSLErrors;
 	@Expose
 	protected TOUCAN_WORKER_TYPE type;
 	@Expose
@@ -84,20 +86,21 @@ public abstract class ToucanWorker extends Thread implements Runnable {
 	protected String callbackString;
 	
 	
-	public ToucanWorker(TOUCAN_WORKER_TYPE type, Context context, String apiToken, String endpoint, String opName, ResponseCallback callback) {
+	public ToucanWorker(TOUCAN_WORKER_TYPE type, Context context, String apiToken, String endpoint, String opName, boolean ignoreSSLErrors, ResponseCallback callback) {
 		this.type = type;
 		this.typeInt = type.ordinal();
 		this.context = context;
 		this.apiToken = apiToken;
 		this.endpoint = endpoint;
 		this.opname = opName;
+		this.ignoreSSLErrors = ignoreSSLErrors;
 		this.callback = callback;
 		if(callback!=null)
 			callbackString = GsonProcessor.getInstance().getGsonWithExposedFilter().toJson(callback);
 		init();
 	}
 	
-	public ToucanWorker(TOUCAN_WORKER_TYPE type, Context context, String apiToken, Object data, TOUCAN_WORKER_POST_DATA_TYPE dataType, String endpoint, String opName, ResponseCallback callback) {
+	public ToucanWorker(TOUCAN_WORKER_TYPE type, Context context, String apiToken, Object data, TOUCAN_WORKER_POST_DATA_TYPE dataType, String endpoint, String opName, boolean ignoreSSLErrors, ResponseCallback callback) {
 		this.type = type;
 		this.typeInt = type.ordinal();
 		this.context = context;
@@ -107,7 +110,8 @@ public abstract class ToucanWorker extends Thread implements Runnable {
 		this.dataType = dataType;
 		this.apiToken = apiToken;
 		this.endpoint = endpoint;
-		this.opname = opName;		
+		this.opname = opName;
+		this.ignoreSSLErrors = ignoreSSLErrors;
 		this.callback = callback;
 		if(callback!=null)
 			callbackString = GsonProcessor.getInstance().getGsonWithExposedFilter().toJson(callback);
@@ -134,6 +138,10 @@ public abstract class ToucanWorker extends Thread implements Runnable {
 	
 	public String getOperationName() {
 		return opname;
+	}
+
+	public boolean isIgnoreSSLErrors() {
+		return ignoreSSLErrors;
 	}
 	
 	public boolean isRunning() {

@@ -44,12 +44,12 @@ import es.javocsoft.android.lib.toucan.client.thread.callback.ResponseCallback;
 public class ToucanPostWorker extends ToucanWorker {
 
 	
-	public ToucanPostWorker(Context context, String apiToken, Object data, TOUCAN_WORKER_POST_DATA_TYPE dataType, String endpoint, String opName, ResponseCallback callback) {
-		super(TOUCAN_WORKER_TYPE.POST, context, apiToken, data, dataType, endpoint, opName, callback);		
+	public ToucanPostWorker(Context context, String apiToken, Object data, TOUCAN_WORKER_POST_DATA_TYPE dataType, String endpoint, String opName, boolean ignoreSSLErrors, ResponseCallback callback) {
+		super(TOUCAN_WORKER_TYPE.POST, context, apiToken, data, dataType, endpoint, opName, ignoreSSLErrors, callback);
 	}
 	
 	public ToucanPostWorker(ToucanWorker tWorker) {
-		super(TOUCAN_WORKER_TYPE.POST, tWorker.context, tWorker.apiToken, tWorker.data, tWorker.dataType, tWorker.endpoint, tWorker.opname, tWorker.callback);
+		super(TOUCAN_WORKER_TYPE.POST, tWorker.context, tWorker.apiToken, tWorker.data, tWorker.dataType, tWorker.endpoint, tWorker.opname, tWorker.isIgnoreSSLErrors(), tWorker.callback);
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public class ToucanPostWorker extends ToucanWorker {
         	String response = ToolBox.net_httpclient_doAction(
         			HTTP_METHOD.POST, 
         			finalUrl, 
-        			jsonDataKey, jsonData, headersData);
+        			jsonDataKey, jsonData, headersData, ignoreSSLErrors);
         	
         	Log.i(ToucanClient.LOG_TAG, opname.toUpperCase() + ". Request <<" + jsonData + 
                     ">>. Sent to Toucan API. Call response '" + response + "'");               
