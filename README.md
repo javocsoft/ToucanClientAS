@@ -4,9 +4,22 @@ An Android Studio client library to connect, in conjuction with ToolBox library 
 
 ## Project Integration ##
 
-This is an Android Studio Library project. To integrate in your project, just put in your application build.gradle the following:
+This is an Android Studio Library project. To integrate in your project, just add a new repository to your project build.gradle:
 
-compile 'es.javocsoft:toucanclient:1.0.0'
+    allprojects {
+        repositories {
+            jcenter()
+            mavenCentral()
+            //JavocSoft Repository
+            maven {
+               url "https://dl.bintray.com/javocsoft/maven"
+            }
+        }
+    }
+
+and in your application build.gradle file:
+
+    compile 'es.javocsoft:toucanclient:1.0.0'
 
 You can also clone the project "ToucanClientAS" from GitHub (https://github.com/javocsoft/ToucanClientAS.git).
 
