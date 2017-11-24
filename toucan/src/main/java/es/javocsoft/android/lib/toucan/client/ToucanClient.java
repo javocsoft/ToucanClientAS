@@ -96,15 +96,15 @@ public class ToucanClient {
 	
 	
 	//ENDPOINTS OF THE API OPERATIONS
-	private static final String API_ENDPOINT_REGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dr";
-	private static final String API_ENDPOINT_UNREGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?du";
-	private static final String API_ENDPOINT_ENABLE_REGISTERED_DEVICE = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?de";
-	private static final String API_ENDPOINT_ACK_RECEIVED = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=2";
-	private static final String API_ENDPOINT_ACK_READ = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=1";
-	private static final String API_ENDPOINT_ADD_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dta";
-	private static final String API_ENDPOINT_REMOVE_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtr";
-	private static final String API_ENDPOINT_LIST_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtl";
-	private static final String API_ENDPOINT_RESET_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtrs";
+	private static String API_ENDPOINT_REGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dr";
+	private static String API_ENDPOINT_UNREGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?du";
+	private static String API_ENDPOINT_ENABLE_REGISTERED_DEVICE = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?de";
+	private static String API_ENDPOINT_ACK_RECEIVED = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=2";
+	private static String API_ENDPOINT_ACK_READ = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=1";
+	private static String API_ENDPOINT_ADD_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dta";
+	private static String API_ENDPOINT_REMOVE_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtr";
+	private static String API_ENDPOINT_LIST_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtl";
+	private static String API_ENDPOINT_RESET_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtrs";
 		
 	private static final String API_OPERATION_DEVICE_REGISTRATION = "DeviceRegistration";
 	private static final String API_OPERATION_DEVICE_UNREGISTRATION = "DeviceUnRegistration";
@@ -173,8 +173,19 @@ public class ToucanClient {
 			toucanClient.apiToken = apiToken;
 			toucanClient.ignoreSSLErrors = ignoreSSLErrors;
 
-			if(svcUrl!=null && svcUrl.length()>0)
+			if(svcUrl!=null && svcUrl.length()>0) {
 				toucanClient.API_ENDPOINT_BASE = svcUrl;
+				//We must override the endpoints URLs
+				toucanClient.API_ENDPOINT_REGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dr";
+				toucanClient.API_ENDPOINT_UNREGISTRATION = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?du";
+				toucanClient.API_ENDPOINT_ENABLE_REGISTERED_DEVICE = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?de";
+				toucanClient.API_ENDPOINT_ACK_RECEIVED = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=2";
+				toucanClient.API_ENDPOINT_ACK_READ = API_ENDPOINT_BASE + "/PushNOTApi/ackreport" +  "?op=1";
+				toucanClient.API_ENDPOINT_ADD_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dta";
+				toucanClient.API_ENDPOINT_REMOVE_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtr";
+				toucanClient.API_ENDPOINT_LIST_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtl";
+				toucanClient.API_ENDPOINT_RESET_TAGS = API_ENDPOINT_BASE + "/PushNOTApi/NOTPushApi" +  "?dtrs";
+			}
 
 			toucanClient.init();
 		}
@@ -714,4 +725,5 @@ public class ToucanClient {
 			Log.e(LOG_TAG, "Error cacheOperationRequest() - Operation request could not be cached [" + e.getMessage() + "].",e);
 		}
 	}
+
 }

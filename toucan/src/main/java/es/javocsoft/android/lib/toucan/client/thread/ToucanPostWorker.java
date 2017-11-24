@@ -62,7 +62,10 @@ public class ToucanPostWorker extends ToucanWorker {
 			
 			String jsonData = GsonProcessor.getInstance().getGsonWithExposedFilter().toJson(data);
 			String finalUrl = (endpoint);
-			
+
+			Log.i(ToucanClient.LOG_TAG, opname.toUpperCase() + ". Request <<" + jsonData +
+					">>. Sent to Toucan API. IgnoreSSL? " + ignoreSSLErrors);
+
 			String jsonDataKey = null;
         	String response = ToolBox.net_httpclient_doAction(
         			HTTP_METHOD.POST, 

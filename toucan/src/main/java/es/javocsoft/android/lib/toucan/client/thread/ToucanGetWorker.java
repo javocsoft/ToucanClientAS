@@ -61,7 +61,9 @@ public class ToucanGetWorker extends ToucanWorker {
 			headersData.put("Authorization", "ttmSecTKN " + apiToken);
 			
 			String finalUrl = endpoint;
-			
+
+			Log.i(ToucanClient.LOG_TAG, opname.toUpperCase() + ". Sent to Toucan API. IgnoreSSL? " + ignoreSSLErrors);
+
 			String jsonData = null;
 			String jsonDataKey = null;
         	String response = ToolBox.net_httpclient_doAction(
