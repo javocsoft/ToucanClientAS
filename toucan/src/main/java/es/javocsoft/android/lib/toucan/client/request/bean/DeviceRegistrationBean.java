@@ -50,6 +50,8 @@ public class DeviceRegistrationBean {
 	@Expose
 	private int extId;
 	@Expose
+	private int groupId;
+	@Expose
 	private String notToken;
 	
 	@Expose
@@ -71,7 +73,7 @@ public class DeviceRegistrationBean {
 	private Date tsUpdate;
 	
 	
-	public DeviceRegistrationBean(int id, int appVersion, int extId,
+	public DeviceRegistrationBean(int id, int appVersion, int extId, int groupId,
 			String notToken, String devId, String devOs, String devExtra, 
 			String devLocale, String devResType, 
 			String installReferral,
@@ -80,6 +82,7 @@ public class DeviceRegistrationBean {
 		this.id = id;
 		this.appVersion = appVersion;
 		this.extId = extId;
+		this.groupId = groupId;
 		this.notToken = notToken;
 		this.devId = devId;
 		this.devOs = devOs;
@@ -112,7 +115,7 @@ public class DeviceRegistrationBean {
 	 * @return
 	 */
 	public String getDataAsString() {
-		return this.appVersion + ";#;" + this.extId + ";#;" +  
+		return this.appVersion + ";#;" + this.extId + ";#;" +  this.groupId + ";#;" +
 				(this.devId==null?"NONE":this.devId) + ";#;" + 				
 				(this.devLocale==null?"NONE":this.devLocale) + ";#;" + 
 				(this.devOs==null?"NONE":this.devOs) + ";#;" + 
@@ -229,5 +232,7 @@ public class DeviceRegistrationBean {
 	public void setTsUpdate(Date tsUpdate) {
 		this.tsUpdate = tsUpdate;
 	}
-	
+
+	public int getGroupId() { return groupId; }
+	public void setGroupId(int groupId) {  this.groupId = groupId; }
 }

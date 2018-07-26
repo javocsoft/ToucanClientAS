@@ -262,6 +262,43 @@ public class ToucanClient {
 		
 		launchDeviceRegistrationRequest(devRegRequest, callback);
 	}
+
+    /**
+     * Registers the device with the specified FCM registration token
+     * for the application. We can also set also an external id and
+     * an external group id for back-end purposes.
+     *
+     * @param notificationToken	The GCM notification token.
+     * @param externalId	An external id that links GCM with some kind of internal back-end.
+     * @param externalGroupId	An external group id that links FCM with some kind of internal back-end.
+     * @param callback	A callback to run when operation finishes.
+     */
+    @SuppressWarnings({"unused"})
+    public void deviceRegistration(String notificationToken, int externalId, int externalGroupId, ResponseCallback callback) {
+        //Save the device GCM notification token.
+        toucanClient.deviceNotificationToken = notificationToken;
+        ToolBox.prefs_savePreference(toucanClient.context, PREF_NAME, PREF_KEY_DEVICE_NOT_TOKEN, String.class, notificationToken);
+
+        DeviceRegistrationRequest devRegRequest = generateDeviceRegistrationInfo(notificationToken);
+        if(externalId>=1) {
+            devRegRequest.getData().setExtId(externalId);
+
+            String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+            devRegRequest.setHashSignature(hashSignature);
+        }
+
+        if(externalGroupId>=1) {
+            devRegRequest.getData().setGroupId(externalGroupId);
+
+            String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+            devRegRequest.setHashSignature(hashSignature);
+        }
+
+        if(callback!=null)
+            callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_REGISTRATION);
+
+        launchDeviceRegistrationRequest(devRegRequest, callback);
+    }
 	
 	/**
 	 * Registers the device with the specified GCM registration token 
@@ -293,7 +330,7 @@ public class ToucanClient {
 	}
 	
 	/**
-	 * Registers the device with the specified GCM registration token 
+	 * Registers the device with the specified FCM registration token
 	 * for the application. We set also an external id for back-end
 	 * purposes. When the installation URL has some referral 
 	 * info, we send this info to the server to be saved.
@@ -325,6 +362,44 @@ public class ToucanClient {
 		
 		launchDeviceRegistrationRequest(devRegRequest, callback);
 	}
+
+    /**
+     * Registers the device with the specified FCM registration token
+     * for the application. We can also set also an external id and an external group id
+     * for back-end purposes. When the installation URL has some referral
+     * info, we send this info to the server to be saved.
+     *
+     * @param notificationToken	The GCM notification token.
+     * @param externalId	An external id that links GCM with some kind of internal back-end.
+     * @param externalGroupId	An external group id that links GCM with some kind of internal back-end.
+     * @param installReferral	The installation referral data.
+     * @param callback	A callback to run when operation finishes.
+     */
+    @SuppressWarnings({"unused"})
+    public void deviceRegistration(String notificationToken, int externalId, int externalGroupId, String installReferral, ResponseCallback callback) {
+        //Save the device GCM notification token.
+        toucanClient.deviceNotificationToken = notificationToken;
+        ToolBox.prefs_savePreference(toucanClient.context, PREF_NAME, PREF_KEY_DEVICE_NOT_TOKEN, String.class, notificationToken);
+
+        DeviceRegistrationRequest devRegRequest = generateDeviceRegistrationInfo(notificationToken);
+        if(installReferral!=null && installReferral.length()>0) {
+            devRegRequest.getData().setInstallReferral(installReferral);
+        }
+        if(externalId>=1) {
+            devRegRequest.getData().setExtId(externalId);
+        }
+        if(externalGroupId>=1) {
+            devRegRequest.getData().setGroupId(externalGroupId);
+        }
+
+        String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+        devRegRequest.setHashSignature(hashSignature);
+
+        if(callback!=null)
+            callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_REGISTRATION);
+
+        launchDeviceRegistrationRequest(devRegRequest, callback);
+    }
 	
 	/**
 	 * Informs to the API the installation referral.
@@ -353,7 +428,45 @@ public class ToucanClient {
 			Log.i(LOG_TAG, API_OPERATION_INFORM_REFERRAL.toUpperCase() + " Error. Notification token not stablished. Please, execute 'deviceRegistration()' first.");
 		}
 	}
-	
+
+	/**
+	 * Informs to the API about the external ids (External User Id, External Group Id). This Ids links
+	 * device stored in notification API with an external CMS user iD AND GROUP iD.
+	 *
+	 * @param externalId	The external id.
+	 * @param externalGroupId	The external group id.
+	 * @param callback	A callback to run when operation finishes.
+	 */
+	@SuppressWarnings({"unused"})
+	public void informExternalIds(int externalId, int externalGroupId, ResponseCallback callback) {
+
+		if(isNotificationTokenPresent()) {
+			DeviceRegistrationRequest devRegRequest =
+					generateDeviceRegistrationInfo(toucanClient.deviceNotificationToken);
+
+			if(externalId!=0) {
+				devRegRequest.getData().setExtId(externalId);
+
+				String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+				devRegRequest.setHashSignature(hashSignature);
+			}
+
+			if(externalGroupId!=0) {
+				devRegRequest.getData().setGroupId(externalGroupId);
+
+				String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+				devRegRequest.setHashSignature(hashSignature);
+			}
+
+			if(callback!=null)
+				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_REGISTRATION);
+
+			launchDeviceRegistrationRequest(devRegRequest, callback);
+		}else{
+			Log.i(LOG_TAG, API_OPERATION_INFORM_REFERRAL.toUpperCase() + " Error. Notification token not stablished. Please, execute 'deviceRegistration()' first.");
+		}
+	}
+
 	/**
 	 * Informs to the API about the external id. This Id links device 
 	 * stored in notification API with an external CMS.
@@ -375,13 +488,42 @@ public class ToucanClient {
 			}
 			
 			if(callback!=null)
-				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_INFORMREFERRAL);
-			
-			launchInformReferralRequest(devRegRequest, callback);
+				callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_REGISTRATION);
+
+			launchDeviceRegistrationRequest(devRegRequest, callback);
 		}else{
 			Log.i(LOG_TAG, API_OPERATION_INFORM_REFERRAL.toUpperCase() + " Error. Notification token not stablished. Please, execute 'deviceRegistration()' first.");
 		}
 	}
+
+    /**
+     * Informs to the API about the external group id. This Id links device
+     * stored in notification API with an external CMS.
+     *
+     * @param externalGroupId	The external group id.
+     * @param callback	A callback to run when operation finishes.
+     */
+    @SuppressWarnings({"unused"})
+    public void informExternalGroupId(int externalGroupId, ResponseCallback callback) {
+
+        if(isNotificationTokenPresent()) {
+            DeviceRegistrationRequest devRegRequest =
+                    generateDeviceRegistrationInfo(toucanClient.deviceNotificationToken);
+            if(externalGroupId!=0) {
+                devRegRequest.getData().setGroupId(externalGroupId);
+
+                String hashSignature = devRegRequest.getData().getSecurityHash(appPublicKey);
+                devRegRequest.setHashSignature(hashSignature);
+            }
+
+            if(callback!=null)
+                callback.setCallbackOperation(ResponseCallback.CALLBACK_OPERATION_DEVICE_REGISTRATION);
+
+			launchDeviceRegistrationRequest(devRegRequest, callback);
+        }else{
+            Log.i(LOG_TAG, API_OPERATION_INFORM_REFERRAL.toUpperCase() + " Error. Notification token not stablished. Please, execute 'deviceRegistration()' first.");
+        }
+    }
 	
 	/**
 	 * Informs to the API that a notification was received.
