@@ -8,7 +8,7 @@ apply plugin: "com.jfrog.bintray"
 // (change to a new version every new library release)
 //
 // 1.- Change version to a new one.
-version = "1.1.4"
+version = "1.1.7"
 // 1.- First, run "Gradle->build->assembleRelease"
 // 2.- Second run "Gradle->Other->Install" to generate Maven stuff.
 //     (it will run task javadocJar and sourcesJar leaving artifacts in $buildDir/libs)
@@ -17,16 +17,16 @@ version = "1.1.4"
 
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
 
         //https://developer.android.com/studio/publish/versioning.html
-        versionCode 15
-        versionName "1.1.4"
+        versionCode 18
+        versionName "1.1.7"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -47,24 +47,25 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
     //implementation 'com.android.support:appcompat-v7:26.1.0'
     //testImplementation 'junit:junit:4.12'
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
     //androidTestImplementation 'com.android.support.test:runner:1.0.1'
     //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     // Other external libraries required
-    compile 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     //Javocsoft library dependencies
-    compile 'es.javocsoft:toolbox:1.4.3'
+    implementation 'es.javocsoft:toolbox:1.5.0'
 }
 
+configurations.provided.canBeResolved = true
 
 // Configuration to be able to generate POM file and upload to JCenter
 def siteUrl = 'https://github.com/javocsoft/ToucanClientAS'      // Homepage URL of the library
